@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <style>
+input[type=text], input[type=password]{
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+button {
+  background-color: #24bf3e;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  align-self: center;
+}
+button:hover  {
+  opacity: 0.7;
+}
+.cancelbutton {
+  width: auto;
+  padding: 10px 18px;
+  background-color: red;
+}
+.imgcontainer {
+  text-align: center;
+  margin: 20px 0 10px 0;
+  position: relative;
+}
+img.avatar {
+  width: 10%;
+  border-radius: 50%;
+}
+.container {
+  padding: 10px;
+}
+span.psw {
+  float: right;
+  padding-top: 10px;
+}
+@media screen and (max-width: 300px) {
+  span.psw {
+    display: block;
+    float: none;
+  }
+  .cancelbutton {
+    width: 100%;
+  }
+}
+</style>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>CSE 442 Homepage</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600"
+    />
+    <!-- https://fonts.google.com/specimen/Open+Sans -->
+    <link rel="stylesheet" href="css/all.min.css" />
+    <!-- https://fontawesome.com/ -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <!-- https://getbootstrap.com/ -->
+    <link rel="stylesheet" href="css/tooplate-style.css" />
+    <!--
+Tooplate 2111 Pro Line
+http://www.tooplate.com/view/2111-pro-line
+-->
+  </head>
+
+  <body>
+    <!-- page header -->
+    <div class="container" id="home">
+      <div class="col-12 text-center">
+        <div class="tm-page-header">
+          <i class="fas fa-4x fa-chart-bar mr-4"></i>
+          <h1 class="d-inline-block text-uppercase">442 Project</h1>
+        </div>
+      </div>
+    </div>
+    <!-- navbar -->
+    <div class="tm-nav-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <nav class="navbar navbar-expand-md navbar-light">
+              <button
+                class="navbar-toggler"
+                type="button"
+                data-toggle="collapse"
+                data-target="#tmMainNav"
+                aria-controls="tmMainNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+              >
+                <span class="navbar-toggler-icon"></span>
+              </button
+              <div class="collapse navbar-collapse" id="tmMainNav">
+                <ul class="navbar-nav mx-auto tm-navbar-nav">
+                  <li class="nav-item active">
+                    <a class="nav-link" href="#home"
+                      >Home <span class="sr-only">(current)</span></a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="localhost:3000/profile.html">Profile</a>
+                  </li>
+
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+
+<div id="omdb_demo" class="row">
+  <div class="col-lg-8 col-lg-offset-2 text-center">
+        <div class="col-lg-4">
+          <label class="sr-only" for="title">Title:</label>
+          <input type="text" class="form-control" name ='title' id="title" placeholder="Title">
+        </div>
+        <div class="col-lg-4">
+          <label class="sr-only" for="year">Year:</label>
+          <input type="text" class="form-control" id="year" placeholder="Year">
+        </div>
+        <button class="btn btn-default" id="omdb_submit">Submit</button>
+  </div>
+<form method ="POST" action="/user-add-movies">
+    <button>ADD</button>
+    
+  </form>
+  <div class="col-lg-8 col-lg-offset-2 text-center">
+      <h2 class="pretty_movie_output">Search Result:</h2>
+  </div>
+
+</div>
+    <script src="js/jquery-1.9.1.min.js"></script>
+<script>
+
+  $("#omdb_submit").click(function(){
+
+
+        //Gather values from the other fields and store them into variables.
+        var title = $("#title").val();
+        var year = $("#year").val(); 
+            $.post('/user-add-movie',{t : title});
+        // Concatenate those variables to a query string.
+        // Note: If you get errors about mixed protocols, then just change the url below to be in https format
+        var queryString = "https://www.omdbapi.com/?apikey=bb152978&t=" + title + "&y=" + year + "&plot=short&r=json";
+        // Put that query string into the AJAX request
+        $.ajax({
+
+            url: queryString, // The URL to the API. You can get this by clicking on "Show CURL example" from an API profile
+            method: 'GET'
+        }).done(function(response) {
+            if(response.length < 1) {
+                // Output error message into output container
+                $("#output").html("Sorry, no movies were found :(");
+            } else {
+                // Output data into output container
+                $("#output").html(JSON.stringify(response));
+
+                // create an HTML element that will hold all of the prettified elements
+                var movieContainer = $('<div class="movie_Container">');
+                movieContainer.append($("<h3 name='MovieN'>").text('Title' + ": " + title))
+
+                // Append the movie container to the existing container
+                $(".pretty_movie_output").append(movieContainer);
+
+                // Go through each property of the object and create/input the data from the object
+                for(var prop in response) {
+                    var element;
+                    if (prop == "Poster" && response[prop] != "N/A") {
+                        element = $("<img class='pretty'>").attr("src", response[prop]);
+                    } else {
+                        element = $("<h3 class='pretty'>").text(prop + ": " + response[prop]);
+                    }
+         
+                    movieContainer.append(element);
+
+                }
+            }
+        });
+    });
+</script>
+
+
+
+</div>
+</body>
+</html>
